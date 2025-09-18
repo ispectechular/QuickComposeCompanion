@@ -164,15 +164,13 @@
     set(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(_){} }
   };
 
-  // ---------- Exceptions ----------
-  // Built-ins + Amanda Wilson override
+  // ---------- Exceptions (built-ins + saved) ----------
   const defaultExceptions = {
     "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
     "janay hackleman": "jhackleman@wawasee.k12.in.us",
     "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us",
     "amanda wilson": "amanda.wilson@wawasee.k12.in.us"
   };
-  // Load saved exceptions (if any), layered over defaults
   let exceptions = Object.assign({}, defaultExceptions, store.get("qcc_exceptions", {}));
 
   // ---------- Helpers ----------
@@ -207,9 +205,9 @@
     const lines = text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
     const regex = /([A-Z][A-Za-z'\-]*(?:\s[A-Z][A-Za-z'\-]*)*),\s*([A-Z][A-Za-z'\-]+)/g;
 
-    for(const line of lines){
+    for (const line of lines){
       let m;
-      while((m = regex.exec(line))){
+      while ((m = regex.exec(line))){
         const lastPart  = m[1];
         const firstPart = m[2];
         const {first,last,full} = nameFromMatch(lastPart, firstPart);
@@ -221,8 +219,9 @@
     const seen = new Set();
     return results.filter(x=>{
       const k = (x.email || '').toLowerCase();
-      if(!k || seen.has(k)) return false;
-      seen.add(k); return true;
+      if (!k || seen.has(k)) return false;
+      seen.add(k);
+      return true;
     });
   }
 
@@ -253,7 +252,7 @@
     });
   }
 
-  // ---------- CC chips ----------
+  // ---------- CC chips (single definition) ----------
   const defaultCcList = [
     { name: "Jesse Ritter", email: "jritter@wawasee.k12.in.us" },
     { name: "Christy Troutman", email: "ctroutman@wawasee.k12.in.us" },
@@ -274,7 +273,7 @@
       div.textContent = p.name;
       div.title = p.email;
       div.onclick = ()=>{
-        if(ccActive.has(p.email)) ccActive.delete(p.email);
+        if (ccActive.has(p.email)) ccActive.delete(p.email);
         else ccActive.add(p.email);
         renderCcChips();
       };
@@ -284,7 +283,6 @@
 
   function renderCcManageRow(){
     const row = $('#ccManageRow');
-    if(!row) return;
     row.innerHTML = '';
     ccList.forEach(p=>{
       const pill = document.createElement('div');
@@ -310,7 +308,7 @@
     let subject = '';
     let bodyLines = [];
 
-    if(kind === 'iep'){
+    if (kind === 'iep'){
       subject = `${FI} ${L} – Updated IEP`.trim();
       bodyLines = [
         'Hello Team,',
@@ -323,7 +321,7 @@
         'Jesse Ritter',
         'Special Education Teacher'
       ];
-    } else if(kind === 'bip'){
+    } else if (kind === 'bip'){
       subject = `${FI} ${L} – Updated IEP and BIP`.trim();
       bodyLines = [
         'Hello Team,',
@@ -361,9 +359,9 @@
     const ccParam = encodeURIComponent(cc.join(','));
 
     let url = `https://mail.google.com/mail/?view=cm&fs=1&to=${toParam}`;
-    if(cc.length) url += `&cc=${ccParam}`;
-    if(su) url += `&su=${su}`;
-    if(body) url += `&body=${body}`;
+    if (cc.length) url += `&cc=${ccParam}`;
+    if (su) url += `&su=${su}`;
+    if (body) url += `&body=${body}`;
     return url;
   }
 
@@ -377,31 +375,30 @@
   // Detected list (edit/select/exception/recompute)
   $('#teacherList').addEventListener('input', (e)=>{
     const t = e.target;
-    if(t.classList.contains('emailEdit')){
+    if (t.classList.contains('emailEdit')){
       const idx = Number(t.dataset.idx);
       detected[idx].email = t.value.trim();
     }
   });
   $('#teacherList').addEventListener('change', (e)=>{
     const t = e.target;
-    if(t.classList.contains('sel')){
+    if (t.classList.contains('sel')){
       const idx = Number(t.dataset.idx);
       detected[idx].selected = t.checked;
     }
   });
   $('#teacherList').addEventListener('click', (e)=>{
     const btn = e.target.closest('button');
-    if(!btn) return;
+    if (!btn) return;
     const idx = Number(btn.dataset.idx);
     const act = btn.dataset.act;
-    if(act === 'makeException'){
+    if (act === 'makeException'){
       const key = canonical(detected[idx].name);
       exceptions[key] = detected[idx].email.trim();
-      // persist exceptions only
-      store.set("qcc_exceptions", exceptions);
+      store.set("qcc_exceptions", exceptions); // persist exceptions only
       alert('Saved exception for ' + detected[idx].name);
     }
-    if(act === 'recompute'){
+    if (act === 'recompute'){
       const {first,last} = detected[idx];
       detected[idx].email = applyExceptionOrRule({first,last});
       renderDetected();
@@ -424,61 +421,23 @@
   $('#studentLast').addEventListener('input',  ()=> fillTemplate($('#templatePick').value));
 
   // CC controls
-  const defaultCcList = [
-    { name: "Jesse Ritter", email: "jritter@wawasee.k12.in.us" },
-    { name: "Christy Troutman", email: "ctroutman@wawasee.k12.in.us" },
-    { name: "Wendy Ortiz", email: "wortiz@wawasee.k12.in.us" },
-    { name: "David Shipley", email: "dshipley@wawasee.k12.in.us" },
-    { name: "Jill Hackleman", email: "jill.hackleman@wawasee.k12.in.us" },
-    { name: "Kari Baker", email: "kbaker@wawasee.k12.in.us" }
-  ];
-  let ccList = JSON.parse(JSON.stringify(defaultCcList));
-  let ccActive = new Set();
-
-  function renderCcChips(){
-    const chips = $('#ccChips');
-    chips.innerHTML = '';
-    ccList.forEach((p)=>{
-      const div = document.createElement('div');
-      div.className = 'chip' + (ccActive.has(p.email)?' active':'');
-      div.textContent = p.name;
-      div.title = p.email;
-      div.onclick = ()=>{
-        if(ccActive.has(p.email)) ccActive.delete(p.email);
-        else ccActive.add(p.email);
-        renderCcChips();
-      };
-      chips.appendChild(div);
-    });
-  }
-  function renderCcManageRow(){
-    const row = $('#ccManageRow');
-    if(!row) return;
-    row.innerHTML = '';
-    ccList.forEach(p=>{
-      const pill = document.createElement('div');
-      pill.className = 'pill';
-      pill.innerHTML = `<span>${p.name}</span><span class="mini">${p.email}</span>`;
-      row.appendChild(pill);
-    });
-  }
+  function initCc(){ renderCcChips(); renderCcManageRow(); }
   $('#editCcList').onclick = ()=>{
     const data = prompt('Edit CC list as JSON (array of {name, email})', JSON.stringify(ccList, null, 2));
-    if(!data) return;
+    if (!data) return;
     try{
       const arr = JSON.parse(data);
-      if(!Array.isArray(arr)) throw new Error('Not an array');
-      ccList = arr; ccActive = new Set(); renderCcChips(); renderCcManageRow();
+      if (!Array.isArray(arr)) throw new Error('Not an array');
+      ccList = arr; ccActive = new Set(); initCc();
     }catch(err){ alert('Invalid JSON.'); }
   };
-  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); renderCcChips(); renderCcManageRow(); };
+  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); initCc(); };
 
   // Compose
   $('#composeGmail').onclick = ()=>{ window.open(composeUrl(), '_blank'); };
 
   // ---------- Init ----------
-  renderCcChips();
-  renderCcManageRow();
+  initCc();
   renderDetected();
   fillTemplate('blank');
 })();
