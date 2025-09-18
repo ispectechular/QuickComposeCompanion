@@ -158,13 +158,22 @@
   const DOMAIN = "@wawasee.k12.in.us";
   const $ = sel => document.querySelector(sel);
 
-  // ---------- Exceptions (in-memory; no persistence) ----------
+  // ---------- Lightweight storage (exceptions only) ----------
+  const store = {
+    get(key, fallback){ try{ const v = localStorage.getItem(key); return v? JSON.parse(v): fallback }catch(_){ return fallback } },
+    set(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(_){} }
+  };
+
+  // ---------- Exceptions ----------
+  // Built-ins + Amanda Wilson override
   const defaultExceptions = {
     "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
     "janay hackleman": "jhackleman@wawasee.k12.in.us",
-    "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us"
+    "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us",
+    "amanda wilson": "amanda.wilson@wawasee.k12.in.us"
   };
-  let exceptions = { ...defaultExceptions };
+  // Load saved exceptions (if any), layered over defaults
+  let exceptions = Object.assign({}, defaultExceptions, store.get("qcc_exceptions", {}));
 
   // ---------- Helpers ----------
   const canonical = (name)=> name.trim().toLowerCase().replace(/\s+/g,' ');
@@ -388,6 +397,8 @@
     if(act === 'makeException'){
       const key = canonical(detected[idx].name);
       exceptions[key] = detected[idx].email.trim();
+      // persist exceptions only
+      store.set("qcc_exceptions", exceptions);
       alert('Saved exception for ' + detected[idx].name);
     }
     if(act === 'recompute'){
@@ -413,23 +424,61 @@
   $('#studentLast').addEventListener('input',  ()=> fillTemplate($('#templatePick').value));
 
   // CC controls
-  function initCc(){ renderCcChips(); renderCcManageRow(); }
+  const defaultCcList = [
+    { name: "Jesse Ritter", email: "jritter@wawasee.k12.in.us" },
+    { name: "Christy Troutman", email: "ctroutman@wawasee.k12.in.us" },
+    { name: "Wendy Ortiz", email: "wortiz@wawasee.k12.in.us" },
+    { name: "David Shipley", email: "dshipley@wawasee.k12.in.us" },
+    { name: "Jill Hackleman", email: "jill.hackleman@wawasee.k12.in.us" },
+    { name: "Kari Baker", email: "kbaker@wawasee.k12.in.us" }
+  ];
+  let ccList = JSON.parse(JSON.stringify(defaultCcList));
+  let ccActive = new Set();
+
+  function renderCcChips(){
+    const chips = $('#ccChips');
+    chips.innerHTML = '';
+    ccList.forEach((p)=>{
+      const div = document.createElement('div');
+      div.className = 'chip' + (ccActive.has(p.email)?' active':'');
+      div.textContent = p.name;
+      div.title = p.email;
+      div.onclick = ()=>{
+        if(ccActive.has(p.email)) ccActive.delete(p.email);
+        else ccActive.add(p.email);
+        renderCcChips();
+      };
+      chips.appendChild(div);
+    });
+  }
+  function renderCcManageRow(){
+    const row = $('#ccManageRow');
+    if(!row) return;
+    row.innerHTML = '';
+    ccList.forEach(p=>{
+      const pill = document.createElement('div');
+      pill.className = 'pill';
+      pill.innerHTML = `<span>${p.name}</span><span class="mini">${p.email}</span>`;
+      row.appendChild(pill);
+    });
+  }
   $('#editCcList').onclick = ()=>{
     const data = prompt('Edit CC list as JSON (array of {name, email})', JSON.stringify(ccList, null, 2));
     if(!data) return;
     try{
       const arr = JSON.parse(data);
       if(!Array.isArray(arr)) throw new Error('Not an array');
-      ccList = arr; ccActive = new Set(); initCc();
+      ccList = arr; ccActive = new Set(); renderCcChips(); renderCcManageRow();
     }catch(err){ alert('Invalid JSON.'); }
   };
-  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); initCc(); };
+  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); renderCcChips(); renderCcManageRow(); };
 
   // Compose
   $('#composeGmail').onclick = ()=>{ window.open(composeUrl(), '_blank'); };
 
   // ---------- Init ----------
-  initCc();
+  renderCcChips();
+  renderCcManageRow();
   renderDetected();
   fillTemplate('blank');
 })();
