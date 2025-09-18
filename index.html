@@ -153,18 +153,20 @@
       </div>
     </section>
   </div>
-
 <script>
 (function(){
   const DOMAIN = "@wawasee.k12.in.us";
   const $ = sel => document.querySelector(sel);
 
+  // ---------- Exceptions (in-memory, no persistence) ----------
   const defaultExceptions = {
     "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
     "janay hackleman": "jhackleman@wawasee.k12.in.us",
     "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us"
   };
+  let exceptions = { ...defaultExceptions };
 
+  // ---------- Helpers ----------
   const canonical = (name)=> name.trim().toLowerCase().replace(/\s+/g,' ');
   const stripDiacritics = (s)=> s.normalize('NFD').replace(/\p{Diacritic}/gu,'');
   const cleanForEmail = (s)=> stripDiacritics(s).toLowerCase().replace(/['`\s-]/g,'');
@@ -179,16 +181,18 @@
   function nameFromMatch(lastPart, firstPart){
     const last = lastPart.replace(/\s+/g,' ').trim();
     let first = firstPart.trim();
+    // strip room code glued to end (e.g., MindyB207)
     first = first.replace(/[A-Z]+\d.*$/, '');
     return { first, last, full: `${first} ${last}` };
   }
 
   function applyExceptionOrRule({first,last}){
     const key = canonical(`${first} ${last}`);
-    if(defaultExceptions[key]) return defaultExceptions[key];
+    if(exceptions[key]) return exceptions[key];
     return ruleEmail(first,last);
   }
 
+  // ---------- Parse schedule ----------
   function parseSchedule(text){
     const results = [];
     const lines = text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
@@ -197,52 +201,232 @@
     for(const line of lines){
       let m;
       while((m = regex.exec(line))){
-        const lastPart = m[1];
-        let firstPart = m[2];
+        const lastPart  = m[1];
+        const firstPart = m[2];
         const {first,last,full} = nameFromMatch(lastPart, firstPart);
         const email = applyExceptionOrRule({first,last});
         results.push({ name: full, first, last, email, selected: true });
       }
     }
+    // de-dupe by email
     const seen = new Set();
-    return results.filter(x=>{ const k=(x.email||'').toLowerCase(); if(!k||seen.has(k)) return false; seen.add(k); return true; });
+    return results.filter(x=>{
+      const k = (x.email || '').toLowerCase();
+      if(!k || seen.has(k)) return false;
+      seen.add(k); return true;
+    });
   }
 
+  // ---------- State ----------
   let detected = [];
 
+  // ---------- Render detected list ----------
   function renderDetected(){
-    const box = document.querySelector('#teacherList');
+    const box = $('#teacherList');
     box.querySelectorAll('.rowx.data').forEach(n=>n.remove());
     detected.forEach((t,i)=>{
       const row = document.createElement('div');
       row.className = 'rowx data';
       row.innerHTML = `
         <div><input type="checkbox" data-idx="${i}" class="sel" ${t.selected? 'checked':''}></div>
-        <div><div class="k">${t.name}</div><div class="mini">First: ${t.first} &nbsp; Last: ${t.last}</div></div>
-        <div><input type="text" value="${t.email}" data-idx="${i}" class="emailEdit" /></div>
-        <div class="flex"><button class="btn ghost" data-idx="${i}" data-act="makeException">Save as exception</button><button class="btn ghost" data-idx="${i}" data-act="recompute">Recompute</button></div>`;
+        <div>
+          <div class="k">${t.name}</div>
+          <div class="mini">First: ${t.first} &nbsp; Last: ${t.last}</div>
+        </div>
+        <div>
+          <input type="text" value="${t.email}" data-idx="${i}" class="emailEdit" />
+        </div>
+        <div class="flex">
+          <button class="btn ghost" data-idx="${i}" data-act="makeException">Save as exception</button>
+          <button class="btn ghost" data-idx="${i}" data-act="recompute">Recompute</button>
+        </div>`;
       box.appendChild(row);
     });
   }
 
-  document.querySelector('#extractBtn').onclick = ()=>{
-    const text = document.querySelector('#schedule').value||'';
-    detected = parseSchedule(text);
-    renderDetected();
+  // ---------- CC chips ----------
+  const defaultCcList = [
+    { name: "Jesse Ritter", email: "jritter@wawasee.k12.in.us" },
+    { name: "Christy Troutman", email: "ctroutman@wawasee.k12.in.us" },
+    { name: "Wendy Ortiz", email: "wortiz@wawasee.k12.in.us" },
+    { name: "David Shipley", email: "dshipley@wawasee.k12.in.us" },
+    { name: "Jill Hackleman", email: "jill.hackleman@wawasee.k12.in.us" },
+    { name: "Kari Baker", email: "kbaker@wawasee.k12.in.us" }
+  ];
+  let ccList = JSON.parse(JSON.stringify(defaultCcList));
+  let ccActive = new Set();
+
+  function renderCcChips(){
+    const chips = $('#ccChips');
+    chips.innerHTML = '';
+    ccList.forEach((p)=>{
+      const div = document.createElement('div');
+      div.className = 'chip' + (ccActive.has(p.email)?' active':'');
+      div.textContent = p.name;
+      div.title = p.email;
+      div.onclick = ()=>{
+        if(ccActive.has(p.email)) ccActive.delete(p.email);
+        else ccActive.add(p.email);
+        renderCcChips();
+      };
+      chips.appendChild(div);
+    });
+  }
+
+  function renderCcManageRow(){
+    const row = $('#ccManageRow');
+    row.innerHTML = '';
+    ccList.forEach(p=>{
+      const pill = document.createElement('div');
+      pill.className = 'pill';
+      pill.innerHTML = `<span>${p.name}</span><span class="mini">${p.email}</span>`;
+      row.appendChild(pill);
+    });
+  }
+
+  // ---------- Templates ----------
+  function firstInitial(){
+    const f = ($('#studentFirst').value||'').trim();
+    return f? f[0].toUpperCase()+'.' : '';
+  }
+  function lastName(){ return ($('#studentLast').value||'').trim(); }
+
+  function fillTemplate(kind){
+    const F = firstInitial();
+    const L = lastName();
+    const First = ($('#studentFirst').value||'').trim();
+    const Full = [First, L].filter(Boolean).join(' ');
+    let subject = '';
+    let body = '';
+
+    if(kind === 'iep'){
+      subject = `${F} ${L} – Updated IEP`.trim();
+      body = [
+        'Hello Team,',
+        '',
+        `Attached you will find the updated IEP for ${Full || '[Student’s Full Name]'}. Please take a few minutes to review the document and let me know if you have any questions, concerns, or need clarification on any of the supports, accommodations, or services listed.`,
+        '',
+        `Thank you for your attention to this update and for your continued support of ${First || '[Student’s First Name]'}.`,
+        '',
+        'Best,',
+        'Jesse Ritter',
+        'Special Education Teacher'
+      ].join('\\n');
+    } else if(kind === 'bip'){
+      subject = `${F} ${L} – Updated IEP and BIP`.trim();
+      body = [
+        'Hello Team,',
+        '',
+        `Attached you will find the updated IEP and Behavior Intervention Plan (BIP) for ${Full || '[Student’s Full Name]'}. Please review both documents carefully and reach out with any questions or concerns about implementation, accommodations, or expectations.`,
+        '',
+        `Thank you for your attention to this update and for your continued support of ${First || '[Student’s First Name]'}.`,
+        '',
+        'Best,',
+        'Jesse Ritter',
+        'Special Education Teacher'
+      ].join('\\n');
+    } else {
+      subject = '';
+      body = '';
+    }
+
+    $('#subjectInput').value = subject;
+    $('#bodyInput').value = body;
+  }
+
+  // ---------- Compose in Gmail ----------
+  function composeUrl(){
+    const to = detected.filter(x=>x.selected && x.email).map(x=>x.email);
+    const ccPreset = Array.from(ccActive);
+    const ccCustom = ($('#ccCustom').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const cc = [...ccPreset, ...ccCustom];
+
+    const su   = encodeURIComponent($('#subjectInput').value||'');
+    const body = encodeURIComponent($('#bodyInput').value||'');
+    const toParam = encodeURIComponent(to.join(','));
+    const ccParam = encodeURIComponent(cc.join(','));
+
+    let url = `https://mail.google.com/mail/?view=cm&fs=1&to=${toParam}`;
+    if(cc.length) url += `&cc=${ccParam}`;
+    if(su) url += `&su=${su}`;
+    if(body) url += `&body=${body}`;
+    return url;
+  }
+
+  // ---------- Wire events ----------
+  // Extract/Clear & selection
+  $('#extractBtn').onclick    = ()=>{ detected = parseSchedule($('#schedule').value||''); renderDetected(); };
+  $('#clearBtn').onclick      = ()=>{ $('#schedule').value=''; detected=[]; renderDetected(); };
+  $('#selectAllBtn').onclick  = ()=>{ detected.forEach(d=>d.selected=true);  renderDetected(); };
+  $('#selectNoneBtn').onclick = ()=>{ detected.forEach(d=>d.selected=false); renderDetected(); };
+
+  // Detected list (edit/select/exception/recompute)
+  $('#teacherList').addEventListener('input', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('emailEdit')){
+      const idx = Number(t.dataset.idx);
+      detected[idx].email = t.value.trim();
+    }
+  });
+  $('#teacherList').addEventListener('change', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('sel')){
+      const idx = Number(t.dataset.idx);
+      detected[idx].selected = t.checked;
+    }
+  });
+  $('#teacherList').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const idx = Number(btn.dataset.idx);
+    const act = btn.dataset.act;
+    if(act === 'makeException'){
+      const key = canonical(detected[idx].name);
+      exceptions[key] = detected[idx].email.trim();
+      alert('Saved exception for ' + detected[idx].name);
+    }
+    if(act === 'recompute'){
+      const {first,last} = detected[idx];
+      detected[idx].email = applyExceptionOrRule({first,last});
+      renderDetected();
+    }
+  });
+
+  // Copy emails
+  $('#copyCsv').onclick = ()=>{
+    const list = detected.filter(x=>x.selected && x.email).map(x=>x.email).join(', ');
+    navigator.clipboard.writeText(list);
+  };
+  $('#copySemi').onclick = ()=>{
+    const list = detected.filter(x=>x.selected && x.email).map(x=>x.email).join('; ');
+    navigator.clipboard.writeText(list);
   };
 
-  document.querySelector('#clearBtn').onclick = ()=>{
-    document.querySelector('#schedule').value='';
-    detected=[]; renderDetected();
-  };
+  // Templates + student fields
+  $('#templatePick').onchange = (e)=> fillTemplate(e.target.value);
+  $('#studentFirst').addEventListener('input', ()=> fillTemplate($('#templatePick').value));
+  $('#studentLast').addEventListener('input',  ()=> fillTemplate($('#templatePick').value));
 
-  document.querySelector('#selectAllBtn').onclick = ()=>{
-    detected.forEach(d=>d.selected=true); renderDetected();
+  // CC controls
+  function initCc(){ renderCcChips(); renderCcManageRow(); }
+  $('#editCcList').onclick = ()=>{
+    const data = prompt('Edit CC list as JSON (array of {name, email})', JSON.stringify(ccList, null, 2));
+    if(!data) return;
+    try{
+      const arr = JSON.parse(data);
+      if(!Array.isArray(arr)) throw new Error('Not an array');
+      ccList = arr; ccActive = new Set(); initCc();
+    }catch(err){ alert('Invalid JSON.'); }
   };
+  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); initCc(); };
 
-  document.querySelector('#selectNoneBtn').onclick = ()=>{
-    detected.forEach(d=>d.selected=false); renderDetected();
-  };
+  // Compose
+  $('#composeGmail').onclick = ()=>{ window.open(composeUrl(), '_blank'); };
+
+  // ---------- Init ----------
+  initCc();
+  renderDetected();
+  fillTemplate('blank');
 })();
 </script>
 </body>
