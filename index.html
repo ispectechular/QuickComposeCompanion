@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quick Compose Companion</title>
+<style>
+  :root{
+    --c1:#4A7A92;
+    --c2:#5A94B1;
+    --c3:#C2D6E1;
+    --c4:#879B8D;
+    --c5:#A0B4A7;
+    --c6:#D3DDD7;
+    --c7:#756A85;
+    --c8:#8E869F;
+    --c9:#C4BFD0;
+    --ink:#0c1b1f;
+    --bg:#ffffff;
+    --muted:#5b6b72;
+    --radius:16px;
+    --shadow:0 10px 25px rgba(20,34,42,0.12);
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:linear-gradient(180deg,var(--c3),#eef3f6 40%);color:var(--ink)}
+  .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+  header{background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;border-radius:var(--radius);padding:22px 22px 18px;box-shadow:var(--shadow)}
+  header h1{margin:0;font-weight:750;letter-spacing:.2px}
+  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  .card h3{margin:0 0 8px;font-size:16px;color:var(--c1)}
+  textarea{width:100%;min-height:180px;border:1px solid var(--c3);border-radius:12px;padding:12px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:var(--c1);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(74,122,146,.25)}
+  .btn.secondary{background:var(--c7)}
+  .btn.ghost{background:#fff;color:var(--c1);border:1px solid var(--c3);box-shadow:none}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:999px;background:var(--c6);font-size:13px}
+  input[type="text"], input[type="email"], select{width:100%;border:1px solid var(--c3);border-radius:10px;padding:10px}
+  .mini{font-size:12px;color:var(--muted)}
+  .list{border:1px solid var(--c3);border-radius:12px;overflow:hidden}
+  .list .rowx{display:grid;grid-template-columns:32px 1.2fr 1.2fr 1fr;gap:10px;padding:10px 12px;border-top:1px solid var(--c6);align-items:center}
+  .list .rowx:first-child{border-top:0;background:var(--c6)}
+  .badge{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--c9);color:#2a2433}
+  .tools{display:flex;flex-wrap:wrap;gap:8px}
+  .flex{display:flex;gap:10px;align-items:center}
+  .k{color:#2a2a2a;font-weight:600}
+  .muted{color:var(--muted)}
+  .section{margin-top:16px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ccbox{display:flex;flex-wrap:wrap;gap:8px}
+  .ccbox .chip{border:1px solid var(--c3);border-radius:999px;padding:8px 10px;background:#fff;cursor:pointer}
+  .ccbox .chip.active{background:var(--c3)}
+  .foot{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+  .note{background:#fff7e5;border:1px solid #ffe7b2;border-radius:12px;padding:10px}
+  .hl{font-weight:700;color:var(--c1)}
+  .sm{font-size:13px}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Quick Compose Companion</h1>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h3>1) Paste schedule</h3>
+        <textarea id="schedule" placeholder="Paste schedule here (e.g., ‘Wilson, Amanda’, ‘Troyer, Cameron’, etc.)"></textarea>
+        <div class="foot">
+          <button class="btn" id="extractBtn">Extract teachers</button>
+          <button class="btn ghost" id="clearBtn">Clear</button>
+          <button class="btn ghost" id="selectAllBtn">Select All</button>
+          <button class="btn ghost" id="selectNoneBtn">Select None</button>
+        </div>
+
+        <div class="section">
+          <h3>2) Detected teachers</h3>
+          <div class="mini">Review parsed names and generated emails. Edit if needed or add an exception override.</div>
+
+          <div class="list" id="teacherList">
+            <div class="rowx" style="font-weight:700;color:#2a2a2a">
+              <div>#</div>
+              <div>Name</div>
+              <div>Email</div>
+              <div>Tools</div>
+            </div>
+          </div>
+
+          <div class="tools" style="margin-top:10px">
+            <button class="btn" id="copyCsv">Copy emails (comma)</button>
+            <button class="btn secondary" id="copySemi">Copy emails (semicolon)</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h3>Options & Templates</h3>
+
+        <div class="section">
+          <div class="split">
+            <div>
+              <label class="mini">Student First Name</label>
+              <input type="text" id="studentFirst" placeholder="e.g., Jordan" />
+            </div>
+            <div>
+              <label class="mini">Student Last Name</label>
+              <input type="text" id="studentLast" placeholder="e.g., Sharp" />
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <label class="mini">Email Template</label>
+          <select id="templatePick">
+            <option value="blank">Blank (no subject/body)</option>
+            <option value="iep">Updated IEP Only</option>
+            <option value="bip">Updated IEP + BIP</option>
+          </select>
+        </div>
+
+        <div class="section">
+          <label class="mini">Subject (auto-fills for templates; you can edit)</label>
+          <input type="text" id="subjectInput" placeholder="Subject" />
+        </div>
+
+        <div class="section">
+          <label class="mini">Body</label>
+          <textarea id="bodyInput" style="min-height:140px" placeholder="Email body…"></textarea>
+        </div>
+
+        <div class="section">
+          <label class="mini">CC (toggle common contacts)</label>
+          <div class="ccbox" id="ccChips"></div>
+          <div class="mini" style="margin-top:6px">Add custom CC (comma-separated)</div>
+          <input type="text" id="ccCustom" placeholder="name@wawasee.k12.in.us, another@wawasee.k12.in.us" />
+        </div>
+
+        <div class="foot">
+          <button class="btn" id="composeGmail">Open in Gmail</button>
+        </div>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:18px">
+      <h3>Preloaded CC choices</h3>
+      <div class="mini">Click to toggle. Edit this list by clicking the pencil icon below.</div>
+      <div class="row" id="ccManageRow" style="margin-top:8px"></div>
+      <div class="foot">
+        <button class="btn ghost" id="editCcList">Edit CC list</button>
+        <button class="btn ghost" id="resetAll">Reset to defaults</button>
+      </div>
+    </section>
+  </div>
+
+<script>
+(function(){
+  const DOMAIN = "@wawasee.k12.in.us";
+  const $ = sel => document.querySelector(sel);
+
+  const defaultExceptions = {
+    "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
+    "janay hackleman": "jhackleman@wawasee.k12.in.us",
+    "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us"
+  };
+
+  const canonical = (name)=> name.trim().toLowerCase().replace(/\s+/g,' ');
+  const stripDiacritics = (s)=> s.normalize('NFD').replace(/\p{Diacritic}/gu,'');
+  const cleanForEmail = (s)=> stripDiacritics(s).toLowerCase().replace(/['`\s-]/g,'');
+
+  function ruleEmail(first, last){
+    if(!first || !last) return '';
+    const fi = cleanForEmail(first)[0] || '';
+    const ln = cleanForEmail(last);
+    return fi + ln + DOMAIN;
+  }
+
+  function nameFromMatch(lastPart, firstPart){
+    const last = lastPart.replace(/\s+/g,' ').trim();
+    let first = firstPart.trim();
+    first = first.replace(/[A-Z]+\d.*$/, '');
+    return { first, last, full: `${first} ${last}` };
+  }
+
+  function applyExceptionOrRule({first,last}){
+    const key = canonical(`${first} ${last}`);
+    if(defaultExceptions[key]) return defaultExceptions[key];
+    return ruleEmail(first,last);
+  }
+
+  function parseSchedule(text){
+    const results = [];
+    const lines = text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
+    const regex = /([A-Z][A-Za-z'\-]*(?:\s[A-Z][A-Za-z'\-]*)*),\s*([A-Z][A-Za-z'\-]+)/g;
+
+    for(const line of lines){
+      let m;
+      while((m = regex.exec(line))){
+        const lastPart = m[1];
+        let firstPart = m[2];
+        const {first,last,full} = nameFromMatch(lastPart, firstPart);
+        const email = applyExceptionOrRule({first,last});
+        results.push({ name: full, first, last, email, selected: true });
+      }
+    }
+    const seen = new Set();
+    return results.filter(x=>{ const k=(x.email||'').toLowerCase(); if(!k||seen.has(k)) return false; seen.add(k); return true; });
+  }
+
+  let detected = [];
+
+  function renderDetected(){
+    const box = document.querySelector('#teacherList');
+    box.querySelectorAll('.rowx.data').forEach(n=>n.remove());
+    detected.forEach((t,i)=>{
+      const row = document.createElement('div');
+      row.className = 'rowx data';
+      row.innerHTML = `
+        <div><input type="checkbox" data-idx="${i}" class="sel" ${t.selected? 'checked':''}></div>
+        <div><div class="k">${t.name}</div><div class="mini">First: ${t.first} &nbsp; Last: ${t.last}</div></div>
+        <div><input type="text" value="${t.email}" data-idx="${i}" class="emailEdit" /></div>
+        <div class="flex"><button class="btn ghost" data-idx="${i}" data-act="makeException">Save as exception</button><button class="btn ghost" data-idx="${i}" data-act="recompute">Recompute</button></div>`;
+      box.appendChild(row);
+    });
+  }
+
+  document.querySelector('#extractBtn').onclick = ()=>{
+    const text = document.querySelector('#schedule').value||'';
+    detected = parseSchedule(text);
+    renderDetected();
+  };
+
+  document.querySelector('#clearBtn').onclick = ()=>{
+    document.querySelector('#schedule').value='';
+    detected=[]; renderDetected();
+  };
+
+  document.querySelector('#selectAllBtn').onclick = ()=>{
+    detected.forEach(d=>d.selected=true); renderDetected();
+  };
+
+  document.querySelector('#selectNoneBtn').onclick = ()=>{
+    detected.forEach(d=>d.selected=false); renderDetected();
+  };
+})();
+</script>
+</body>
+</html>
