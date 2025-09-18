@@ -158,7 +158,7 @@
   const DOMAIN = "@wawasee.k12.in.us";
   const $ = sel => document.querySelector(sel);
 
-  // ---------- Exceptions (in-memory, no persistence) ----------
+  // ---------- Exceptions (in-memory; no persistence) ----------
   const defaultExceptions = {
     "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
     "janay hackleman": "jhackleman@wawasee.k12.in.us",
@@ -275,6 +275,7 @@
 
   function renderCcManageRow(){
     const row = $('#ccManageRow');
+    if(!row) return;
     row.innerHTML = '';
     ccList.forEach(p=>{
       const pill = document.createElement('div');
@@ -292,16 +293,17 @@
   function lastName(){ return ($('#studentLast').value||'').trim(); }
 
   function fillTemplate(kind){
-    const F = firstInitial();
-    const L = lastName();
+    const FI = firstInitial();
+    const L  = lastName();
     const First = ($('#studentFirst').value||'').trim();
     const Full = [First, L].filter(Boolean).join(' ');
+
     let subject = '';
-    let body = '';
+    let bodyLines = [];
 
     if(kind === 'iep'){
-      subject = `${F} ${L} – Updated IEP`.trim();
-      body = [
+      subject = `${FI} ${L} – Updated IEP`.trim();
+      bodyLines = [
         'Hello Team,',
         '',
         `Attached you will find the updated IEP for ${Full || '[Student’s Full Name]'}. Please take a few minutes to review the document and let me know if you have any questions, concerns, or need clarification on any of the supports, accommodations, or services listed.`,
@@ -311,10 +313,10 @@
         'Best,',
         'Jesse Ritter',
         'Special Education Teacher'
-      ].join('\\n');
+      ];
     } else if(kind === 'bip'){
-      subject = `${F} ${L} – Updated IEP and BIP`.trim();
-      body = [
+      subject = `${FI} ${L} – Updated IEP and BIP`.trim();
+      bodyLines = [
         'Hello Team,',
         '',
         `Attached you will find the updated IEP and Behavior Intervention Plan (BIP) for ${Full || '[Student’s Full Name]'}. Please review both documents carefully and reach out with any questions or concerns about implementation, accommodations, or expectations.`,
@@ -324,25 +326,28 @@
         'Best,',
         'Jesse Ritter',
         'Special Education Teacher'
-      ].join('\\n');
+      ];
     } else {
       subject = '';
-      body = '';
+      bodyLines = [];
     }
 
     $('#subjectInput').value = subject;
-    $('#bodyInput').value = body;
+    $('#bodyInput').value = bodyLines.join('\n');
   }
 
   // ---------- Compose in Gmail ----------
   function composeUrl(){
     const to = detected.filter(x=>x.selected && x.email).map(x=>x.email);
     const ccPreset = Array.from(ccActive);
-    const ccCustom = ($('#ccCustom').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const ccCustom = ($('#ccCustom').value||'').split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
     const cc = [...ccPreset, ...ccCustom];
 
-    const su   = encodeURIComponent($('#subjectInput').value||'');
-    const body = encodeURIComponent($('#bodyInput').value||'');
+    const su = encodeURIComponent($('#subjectInput').value||'');
+    const bodyRaw = $('#bodyInput').value || '';
+    // Normalize newlines to CRLF for Gmail rendering
+    const body = encodeURIComponent(bodyRaw.replace(/\r?\n/g, '\r\n'));
+
     const toParam = encodeURIComponent(to.join(','));
     const ccParam = encodeURIComponent(cc.join(','));
 
