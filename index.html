@@ -6,53 +6,32 @@
 <title>Quick Compose Companion</title>
 <style>
   :root{
-    --c1:#4A7A92; --c2:#5A94B1; --c3:#C2D6E1; --c4:#879B8D; --c5:#A0B4A7;
-    --c6:#D3DDD7; --c7:#756A85; --c8:#8E869F; --c9:#C4BFD0;
-    --ink:#0c1b1f; --muted:#5b6b72;
+    --c1:#4A7A92;
+    --c2:#5A94B1;
+    --c3:#C2D6E1;
+    --c4:#879B8D;
+    --c5:#A0B4A7;
+    --c6:#D3DDD7;
+    --c7:#756A85;
+    --c8:#8E869F;
+    --c9:#C4BFD0;
+    --ink:#0c1b1f;
+    --bg:#ffffff;
+    --muted:#5b6b72;
     --radius:16px;
     --shadow:0 10px 25px rgba(20,34,42,0.12);
   }
   *{box-sizing:border-box}
-  html, body { height:100% }
-  body{
-    margin:0;
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);
-    background:transparent; /* transparent page background */
-  }
-  .wrap{max-width:1100px;margin:24px auto;padding:0 20px}
-
-  header{
-    background:#fff;
-    color:var(--ink);
-    border:1px solid var(--c6);
-    border-radius:var(--radius);
-    padding:18px 18px 14px;
-    box-shadow:var(--shadow);
-  }
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:linear-gradient(180deg,var(--c3),#eef3f6 40%);color:var(--ink)}
+  .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+  header{background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;border-radius:var(--radius);padding:22px 22px 18px;box-shadow:var(--shadow)}
   header h1{margin:0;font-weight:750;letter-spacing:.2px}
-
   .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}
-  .card{
-    background:#fff;
-    border:1px solid var(--c6);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:16px;
-  }
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
   .card h3{margin:0 0 8px;font-size:16px;color:var(--c1)}
-  textarea{
-    width:100%;min-height:180px;border:1px solid var(--c3);border-radius:12px;
-    padding:12px;resize:vertical;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-    white-space:pre-wrap;
-  }
+  textarea{width:100%;min-height:180px;border:1px solid var(--c3);border-radius:12px;padding:12px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .btn{
-    appearance:none;border:0;border-radius:12px;padding:10px 14px;
-    background:var(--c1);color:#fff;font-weight:600;cursor:pointer;
-    box-shadow:0 4px 12px rgba(74,122,146,.25);
-  }
+  .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:var(--c1);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(74,122,146,.25)}
   .btn.secondary{background:var(--c7)}
   .btn.ghost{background:#fff;color:var(--c1);border:1px solid var(--c3);box-shadow:none}
   .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -61,25 +40,29 @@
   .mini{font-size:12px;color:var(--muted)}
   .list{border:1px solid var(--c3);border-radius:12px;overflow:hidden}
   .list .rowx{display:grid;grid-template-columns:32px 1.2fr 1.2fr 1fr;gap:10px;padding:10px 12px;border-top:1px solid var(--c6);align-items:center}
-  .list .rowx:first-child{border-top:0;background:#fafafa}
+  .list .rowx:first-child{border-top:0;background:var(--c6)}
+  .badge{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--c9);color:#2a2433}
   .tools{display:flex;flex-wrap:wrap;gap:8px}
   .flex{display:flex;gap:10px;align-items:center}
   .k{color:#2a2a2a;font-weight:600}
+  .muted{color:var(--muted)}
   .section{margin-top:16px}
   .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .ccbox{display:flex;flex-wrap:wrap;gap:8px}
   .ccbox .chip{border:1px solid var(--c3);border-radius:999px;padding:8px 10px;background:#fff;cursor:pointer}
   .ccbox .chip.active{background:var(--c3)}
   .foot{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
-
-  @media (max-width: 900px){
-    .grid{grid-template-columns:1fr;gap:14px}
-  }
+  .note{background:#fff7e5;border:1px solid #ffe7b2;border-radius:12px;padding:10px}
+  .hl{font-weight:700;color:var(--c1)}
+  .sm{font-size:13px}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <header><h1>Quick Compose Companion</h1></header>
+    <header>
+      <h1>Quick Compose Companion</h1>
+    </header>
 
     <div class="grid">
       <section class="card">
@@ -170,7 +153,6 @@
       </div>
     </section>
   </div>
-
 <script>
 (function(){
   const DOMAIN = "@wawasee.k12.in.us";
@@ -178,7 +160,7 @@
 
   // ---------- Lightweight storage (exceptions only) ----------
   const store = {
-    get(key, fallback){ try{ const v = localStorage.getItem(key); return v? JSON.parse(v): fallback; }catch(_){ return fallback; } },
+    get(key, fallback){ try{ const v = localStorage.getItem(key); return v? JSON.parse(v): fallback }catch(_){ return fallback } },
     set(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(_){} }
   };
 
@@ -187,15 +169,14 @@
     "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
     "janay hackleman": "jhackleman@wawasee.k12.in.us",
     "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us",
-    "amanda wilson": "amanda.wilson@wawasee.k12.in.us",
-    "diane miller": "Diane.miller@wawasee.k12.in.us" // special-case per your note
+    "amanda wilson": "amanda.wilson@wawasee.k12.in.us"
   };
   let exceptions = Object.assign({}, defaultExceptions, store.get("qcc_exceptions", {}));
 
-  // ---------- Helpers (robust + Unicode-aware) ----------
+  // ---------- Helpers ----------
   const canonical = (name)=> name.trim().toLowerCase().replace(/\s+/g,' ');
   const stripDiacritics = (s)=> s.normalize('NFD').replace(/\p{Diacritic}/gu,'');
-  const cleanForEmail = (s)=> stripDiacritics(s).toLowerCase().replace(/['’`\s-]/g,'');
+  const cleanForEmail = (s)=> stripDiacritics(s).toLowerCase().replace(/['`\s-]/g,'');
 
   function ruleEmail(first, last){
     if(!first || !last) return '';
@@ -204,19 +185,12 @@
     return fi + ln + DOMAIN;
   }
 
-  function stripRoomCodes(s){
-    // trims things like "(A123)", glued rooms like "MindyB207", trailing section numbers, etc.
-    return s.replace(/\([^\)]*\)$/,'')          // trailing parentheses
-            .replace(/[A-Z]{1,3}\d{2,}.*$/i,'') // glued room like B207
-            .replace(/\d{2,}.*$/,'')            // trailing numbers
-            .trim();
-  }
-
-  function nameFromParts(lastPart, firstPart){
-    const last  = stripRoomCodes((lastPart||'').replace(/\s+/g,' ').trim());
-    let first   = stripRoomCodes((firstPart||'').trim());
-    const firstMain = first.split(/\s+/)[0] || '';
-    return { first:firstMain, last, full: `${first} ${last}`.trim() };
+  function nameFromMatch(lastPart, firstPart){
+    const last = lastPart.replace(/\s+/g,' ').trim();
+    let first = firstPart.trim();
+    // strip room code glued to end (e.g., MindyB207)
+    first = first.replace(/[A-Z]+\d.*$/, '');
+    return { first, last, full: `${first} ${last}` };
   }
 
   function applyExceptionOrRule({first,last}){
@@ -225,67 +199,30 @@
     return ruleEmail(first,last);
   }
 
-  // Regexes (Unicode letters, hyphens, apostrophes; case-insensitive)
-  const RX_COMMA = /([\p{L}][\p{L}'’\-]*(?:\s+[\p{L}][\p{L}'’\-]*)*)\s*,\s*([\p{L}][\p{L}'’\-\.]*)\b/giu;
-  const RX_SPACE = /(^|\b)([\p{L}][\p{L}'’\-]*)(?:\s+([\p{L}][\p{L}'’\-]*))(?:\s+([\p{L}\.]{1,3}))?(\b|$)/giu;
-
-  // ---------- Parser ----------
+  // ---------- Parse schedule ----------
   function parseSchedule(text){
-    if(!text) return [];
-    let norm = text
-      .replace(/[“”]/g,'"')
-      .replace(/[‘’]/g,"'")
-      .replace(/[•·●]/g,' ')
-      .replace(/\t+/g,' ')
-      .replace(/\s{2,}/g,' ')
-      .trim();
-
     const results = [];
+    const lines = text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
+    const regex = /([A-Z][A-Za-z'\-]*(?:\s[A-Z][A-Za-z'\-]*)*),\s*([A-Z][A-Za-z'\-]+)/g;
 
-    // Pass 1: explicit "Last, First"
-    let m;
-    while((m = RX_COMMA.exec(norm))){
-      const lastPart  = m[1];
-      const firstPart = m[2];
-      const {first,last,full} = nameFromParts(lastPart, firstPart);
-      if(first && last){
+    for (const line of lines){
+      let m;
+      while ((m = regex.exec(line))){
+        const lastPart  = m[1];
+        const firstPart = m[2];
+        const {first,last,full} = nameFromMatch(lastPart, firstPart);
         const email = applyExceptionOrRule({first,last});
         results.push({ name: full, first, last, email, selected: true });
       }
     }
-
-    // Remove comma-style matches to avoid duplicates in fallback
-    const scrubbed = norm.replace(RX_COMMA, ' ').replace(/\s{2,}/g,' ');
-
-    // Pass 2: fallback "First Last"
-    const BAD_WORDS = new Set([
-      'period','semester','block','room','grade','teacher','study','hall',
-      'math','english','science','history','pe','lunch','am','pm'
-    ]);
-    while((m = RX_SPACE.exec(scrubbed))){
-      const first = (m[2]||'').trim();
-      const last  = (m[3]||'').trim();
-      if(!first || !last) continue;
-      if(first.length < 2 || last.length < 2) continue;
-      if(BAD_WORDS.has(first.toLowerCase()) || BAD_WORDS.has(last.toLowerCase())) continue;
-
-      const {first:firstMain,last:lastMain,full} = nameFromParts(last, first);
-      if(firstMain && lastMain){
-        const email = applyExceptionOrRule({first:firstMain,last:lastMain});
-        results.push({ name: full, first:firstMain, last:lastMain, email, selected: true });
-      }
-    }
-
-    // De-dupe by email
+    // de-dupe by email
     const seen = new Set();
-    const out = [];
-    for(const r of results){
-      const k = (r.email||'').toLowerCase();
-      if(!k || seen.has(k)) continue;
+    return results.filter(x=>{
+      const k = (x.email || '').toLowerCase();
+      if (!k || seen.has(k)) return false;
       seen.add(k);
-      out.push(r);
-    }
-    return out;
+      return true;
+    });
   }
 
   // ---------- State ----------
@@ -315,14 +252,14 @@
     });
   }
 
-  // ---------- CC chips ----------
+  // ---------- CC chips (single definition) ----------
   const defaultCcList = [
-    { name: "Jesse Ritter",   email: "jritter@wawasee.k12.in.us" },
+    { name: "Jesse Ritter", email: "jritter@wawasee.k12.in.us" },
     { name: "Christy Troutman", email: "ctroutman@wawasee.k12.in.us" },
-    { name: "Wendy Ortiz",    email: "wortiz@wawasee.k12.in.us" },
-    { name: "David Shipley",  email: "dshipley@wawasee.k12.in.us" },
+    { name: "Wendy Ortiz", email: "wortiz@wawasee.k12.in.us" },
+    { name: "David Shipley", email: "dshipley@wawasee.k12.in.us" },
     { name: "Jill Hackleman", email: "jill.hackleman@wawasee.k12.in.us" },
-    { name: "Kari Baker",     email: "kbaker@wawasee.k12.in.us" }
+    { name: "Kari Baker", email: "kbaker@wawasee.k12.in.us" }
   ];
   let ccList = JSON.parse(JSON.stringify(defaultCcList));
   let ccActive = new Set();
@@ -350,7 +287,7 @@
     ccList.forEach(p=>{
       const pill = document.createElement('div');
       pill.className = 'pill';
-      pill.innerHTML = `<span>${p.name}</span><span class="mini" style="margin-left:6px">${p.email}</span>`;
+      pill.innerHTML = `<span>${p.name}</span><span class="mini">${p.email}</span>`;
       row.appendChild(pill);
     });
   }
@@ -358,7 +295,7 @@
   // ---------- Templates ----------
   function firstInitial(){
     const f = ($('#studentFirst').value||'').trim();
-    return f ? (f[0].toUpperCase() + '.') : '';
+    return f? f[0].toUpperCase()+'.' : '';
   }
   function lastName(){ return ($('#studentLast').value||'').trim(); }
 
@@ -403,7 +340,7 @@
     }
 
     $('#subjectInput').value = subject;
-    $('#bodyInput').value    = bodyLines.join('\r\n'); // CRLF to render cleanly in Gmail
+    $('#bodyInput').value = bodyLines.join('\n');
   }
 
   // ---------- Compose in Gmail ----------
@@ -413,26 +350,29 @@
     const ccCustom = ($('#ccCustom').value||'').split(/[,;]+/).map(s=>s.trim()).filter(Boolean);
     const cc = [...ccPreset, ...ccCustom];
 
-    const su   = encodeURIComponent($('#subjectInput').value||'');
-    const body = encodeURIComponent(($('#bodyInput').value||'').replace(/\r?\n/g, '\r\n'));
+    const su = encodeURIComponent($('#subjectInput').value||'');
+    const bodyRaw = $('#bodyInput').value || '';
+    // Normalize newlines to CRLF for Gmail rendering
+    const body = encodeURIComponent(bodyRaw.replace(/\r?\n/g, '\r\n'));
 
     const toParam = encodeURIComponent(to.join(','));
     const ccParam = encodeURIComponent(cc.join(','));
 
     let url = `https://mail.google.com/mail/?view=cm&fs=1&to=${toParam}`;
     if (cc.length) url += `&cc=${ccParam}`;
-    if (su)        url += `&su=${su}`;
-    if (body)      url += `&body=${body}`;
+    if (su) url += `&su=${su}`;
+    if (body) url += `&body=${body}`;
     return url;
   }
 
   // ---------- Wire events ----------
+  // Extract/Clear & selection
   $('#extractBtn').onclick    = ()=>{ detected = parseSchedule($('#schedule').value||''); renderDetected(); };
   $('#clearBtn').onclick      = ()=>{ $('#schedule').value=''; detected=[]; renderDetected(); };
   $('#selectAllBtn').onclick  = ()=>{ detected.forEach(d=>d.selected=true);  renderDetected(); };
   $('#selectNoneBtn').onclick = ()=>{ detected.forEach(d=>d.selected=false); renderDetected(); };
 
-  // Detected list edits
+  // Detected list (edit/select/exception/recompute)
   $('#teacherList').addEventListener('input', (e)=>{
     const t = e.target;
     if (t.classList.contains('emailEdit')){
@@ -455,7 +395,7 @@
     if (act === 'makeException'){
       const key = canonical(detected[idx].name);
       exceptions[key] = detected[idx].email.trim();
-      store.set("qcc_exceptions", exceptions);
+      store.set("qcc_exceptions", exceptions); // persist exceptions only
       alert('Saved exception for ' + detected[idx].name);
     }
     if (act === 'recompute'){
@@ -465,8 +405,8 @@
     }
   });
 
-  // Copy buttons
-  $('#copyCsv').onclick  = ()=>{
+  // Copy emails
+  $('#copyCsv').onclick = ()=>{
     const list = detected.filter(x=>x.selected && x.email).map(x=>x.email).join(', ');
     navigator.clipboard.writeText(list);
   };
@@ -475,29 +415,29 @@
     navigator.clipboard.writeText(list);
   };
 
-  // Template + student fields
+  // Templates + student fields
   $('#templatePick').onchange = (e)=> fillTemplate(e.target.value);
   $('#studentFirst').addEventListener('input', ()=> fillTemplate($('#templatePick').value));
   $('#studentLast').addEventListener('input',  ()=> fillTemplate($('#templatePick').value));
 
   // CC controls
-  function renderCcUI(){ renderCcChips(); renderCcManageRow(); }
+  function initCc(){ renderCcChips(); renderCcManageRow(); }
   $('#editCcList').onclick = ()=>{
     const data = prompt('Edit CC list as JSON (array of {name, email})', JSON.stringify(ccList, null, 2));
     if (!data) return;
     try{
       const arr = JSON.parse(data);
       if (!Array.isArray(arr)) throw new Error('Not an array');
-      ccList = arr; ccActive = new Set(); renderCcUI();
+      ccList = arr; ccActive = new Set(); initCc();
     }catch(err){ alert('Invalid JSON.'); }
   };
-  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); renderCcUI(); };
+  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); initCc(); };
 
   // Compose
   $('#composeGmail').onclick = ()=>{ window.open(composeUrl(), '_blank'); };
 
   // ---------- Init ----------
-  renderCcUI();
+  initCc();
   renderDetected();
   fillTemplate('blank');
 })();
