@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,53 +7,32 @@
 <title>Quick Compose Companion</title>
 <style>
   :root{
-    --c1:#4A7A92; --c2:#5A94B1; --c3:#C2D6E1; --c4:#879B8D; --c5:#A0B4A7;
-    --c6:#D3DDD7; --c7:#756A85; --c8:#8E869F; --c9:#C4BFD0;
-    --ink:#0c1b1f; --muted:#5b6b72;
+    --c1:#4A7A92;
+    --c2:#5A94B1;
+    --c3:#C2D6E1;
+    --c4:#879B8D;
+    --c5:#A0B4A7;
+    --c6:#D3DDD7;
+    --c7:#756A85;
+    --c8:#8E869F;
+    --c9:#C4BFD0;
+    --ink:#0c1b1f;
+    --bg:#ffffff;
+    --muted:#5b6b72;
     --radius:16px;
     --shadow:0 10px 25px rgba(20,34,42,0.12);
   }
   *{box-sizing:border-box}
-  html, body { height:100% }
-  body{
-    margin:0;
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);
-    background:transparent; /* transparent page background */
-  }
-  .wrap{max-width:1100px;margin:24px auto;padding:0 20px}
-
-  /* Header now a neutral card (no gradients) */
-  header{
-    background:#fff;
-    color:var(--ink);
-    border:1px solid var(--c6);
-    border-radius:var(--radius);
-    padding:18px 18px 14px;
-    box-shadow:var(--shadow);
-  }
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:linear-gradient(180deg,var(--c3),#eef3f6 40%);color:var(--ink)}
+  .wrap{max-width:1100px;margin:40px auto;padding:0 20px}
+  header{background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;border-radius:var(--radius);padding:22px 22px 18px;box-shadow:var(--shadow)}
   header h1{margin:0;font-weight:750;letter-spacing:.2px}
-
   .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:18px}
-  .card{
-    background:#fff;
-    border:1px solid var(--c6);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:16px;
-  }
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
   .card h3{margin:0 0 8px;font-size:16px;color:var(--c1)}
-  textarea{
-    width:100%;min-height:180px;border:1px solid var(--c3);border-radius:12px;
-    padding:12px;resize:vertical;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace
-  }
+  textarea{width:100%;min-height:180px;border:1px solid var(--c3);border-radius:12px;padding:12px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .btn{
-    appearance:none;border:0;border-radius:12px;padding:10px 14px;
-    background:var(--c1);color:#fff;font-weight:600;cursor:pointer;
-    box-shadow:0 4px 12px rgba(74,122,146,.25)
-  }
+  .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;background:var(--c1);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(74,122,146,.25)}
   .btn.secondary{background:var(--c7)}
   .btn.ghost{background:#fff;color:var(--c1);border:1px solid var(--c3);box-shadow:none}
   .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -61,7 +41,7 @@
   .mini{font-size:12px;color:var(--muted)}
   .list{border:1px solid var(--c3);border-radius:12px;overflow:hidden}
   .list .rowx{display:grid;grid-template-columns:32px 1.2fr 1.2fr 1fr;gap:10px;padding:10px 12px;border-top:1px solid var(--c6);align-items:center}
-  .list .rowx:first-child{border-top:0;background:#fafafa}
+  .list .rowx:first-child{border-top:0;background:var(--c6)}
   .badge{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--c9);color:#2a2433}
   .tools{display:flex;flex-wrap:wrap;gap:8px}
   .flex{display:flex;gap:10px;align-items:center}
@@ -77,15 +57,13 @@
   .hl{font-weight:700;color:var(--c1)}
   .sm{font-size:13px}
   .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
-
-  @media (max-width: 900px){
-    .grid{grid-template-columns:1fr;gap:14px}
-  }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <header><h1>Quick Compose Companion</h1></header>
+    <header>
+      <h1>Quick Compose Companion</h1>
+    </header>
 
     <div class="grid">
       <section class="card">
@@ -176,7 +154,6 @@
       </div>
     </section>
   </div>
-
 <script>
 (function(){
   const DOMAIN = "@wawasee.k12.in.us";
@@ -193,8 +170,7 @@
     "jill hackleman": "jill.hackleman@wawasee.k12.in.us",
     "janay hackleman": "jhackleman@wawasee.k12.in.us",
     "jennifer phillips": "jennifer.phillips@wawasee.k12.in.us",
-    "amanda wilson": "amanda.wilson@wawasee.k12.in.us",
-    "diane miller": "Diane.miller@wawasee.k12.in.us"  // NEW special-case
+    "amanda wilson": "amanda.wilson@wawasee.k12.in.us"
   };
   let exceptions = Object.assign({}, defaultExceptions, store.get("qcc_exceptions", {}));
 
@@ -321,7 +297,7 @@
   function firstInitial(){
     const f = ($('#studentFirst').value||'').trim();
     return f? f[0].toUpperCase()+'.' : '';
-    }
+  }
   function lastName(){ return ($('#studentLast').value||'').trim(); }
 
   function fillTemplate(kind){
@@ -365,8 +341,7 @@
     }
 
     $('#subjectInput').value = subject;
-    // Normalize newlines to render cleanly when opened in Gmail (no "\n" artifacts)
-    $('#bodyInput').value = bodyLines.join('\r\n');
+    $('#bodyInput').value = bodyLines.join('\n');
   }
 
   // ---------- Compose in Gmail ----------
@@ -378,7 +353,8 @@
 
     const su = encodeURIComponent($('#subjectInput').value||'');
     const bodyRaw = $('#bodyInput').value || '';
-    const body = encodeURIComponent(bodyRaw.replace(/\r?\n/g, '\r\n')); // CRLF for Gmail
+    // Normalize newlines to CRLF for Gmail rendering
+    const body = encodeURIComponent(bodyRaw.replace(/\r?\n/g, '\r\n'));
 
     const toParam = encodeURIComponent(to.join(','));
     const ccParam = encodeURIComponent(cc.join(','));
@@ -391,11 +367,13 @@
   }
 
   // ---------- Wire events ----------
+  // Extract/Clear & selection
   $('#extractBtn').onclick    = ()=>{ detected = parseSchedule($('#schedule').value||''); renderDetected(); };
   $('#clearBtn').onclick      = ()=>{ $('#schedule').value=''; detected=[]; renderDetected(); };
   $('#selectAllBtn').onclick  = ()=>{ detected.forEach(d=>d.selected=true);  renderDetected(); };
   $('#selectNoneBtn').onclick = ()=>{ detected.forEach(d=>d.selected=false); renderDetected(); };
 
+  // Detected list (edit/select/exception/recompute)
   $('#teacherList').addEventListener('input', (e)=>{
     const t = e.target;
     if (t.classList.contains('emailEdit')){
@@ -428,6 +406,7 @@
     }
   });
 
+  // Copy emails
   $('#copyCsv').onclick = ()=>{
     const list = detected.filter(x=>x.selected && x.email).map(x=>x.email).join(', ');
     navigator.clipboard.writeText(list);
@@ -437,55 +416,29 @@
     navigator.clipboard.writeText(list);
   };
 
+  // Templates + student fields
   $('#templatePick').onchange = (e)=> fillTemplate(e.target.value);
   $('#studentFirst').addEventListener('input', ()=> fillTemplate($('#templatePick').value));
   $('#studentLast').addEventListener('input',  ()=> fillTemplate($('#templatePick').value));
 
   // CC controls
-  const defaultCcList = [
-    { name: "Jesse Ritter", email: "jritter@wawasee.k12.in.us" },
-    { name: "Christy Troutman", email: "ctroutman@wawasee.k12.in.us" },
-    { name: "Wendy Ortiz", email: "wortiz@wawasee.k12.in.us" },
-    { name: "David Shipley", email: "dshipley@wawasee.k12.in.us" },
-    { name: "Jill Hackleman", email: "jill.hackleman@wawasee.k12.in.us" },
-    { name: "Kari Baker", email: "kbaker@wawasee.k12.in.us" }
-  ]; // (redeclared for clarity in UI section)
-  let ccList = JSON.parse(JSON.stringify(defaultCcList));
-  let ccActive = new Set();
-
-  function renderCcChips(){
-    const chips = $('#ccChips');
-    chips.innerHTML = '';
-    ccList.forEach((p)=>{
-      const div = document.createElement('div');
-      div.className = 'chip' + (ccActive.has(p.email)?' active':'');
-      div.textContent = p.name;
-      div.title = p.email;
-      div.onclick = ()=>{
-        if (ccActive.has(p.email)) ccActive.delete(p.email);
-        else ccActive.add(p.email);
-        renderCcChips();
-      };
-      chips.appendChild(div);
-    });
-  }
-  function renderCcManageRow(){
-    const row = $('#ccManageRow');
-    row.innerHTML = '';
-    ccList.forEach(p=>{
-      const pill = document.createElement('div');
-      pill.className = 'pill';
-      pill.innerHTML = `<span>${p.name}</span><span class="mini">${p.email}</span>`;
-      row.appendChild(pill);
-    });
-  }
+  function initCc(){ renderCcChips(); renderCcManageRow(); }
+  $('#editCcList').onclick = ()=>{
+    const data = prompt('Edit CC list as JSON (array of {name, email})', JSON.stringify(ccList, null, 2));
+    if (!data) return;
+    try{
+      const arr = JSON.parse(data);
+      if (!Array.isArray(arr)) throw new Error('Not an array');
+      ccList = arr; ccActive = new Set(); initCc();
+    }catch(err){ alert('Invalid JSON.'); }
+  };
+  $('#resetAll').onclick = ()=>{ ccList = JSON.parse(JSON.stringify(defaultCcList)); ccActive = new Set(); initCc(); };
 
   // Compose
   $('#composeGmail').onclick = ()=>{ window.open(composeUrl(), '_blank'); };
 
   // ---------- Init ----------
-  renderCcChips();
-  renderCcManageRow();
+  initCc();
   renderDetected();
   fillTemplate('blank');
 })();
